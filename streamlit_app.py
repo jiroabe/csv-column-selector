@@ -21,10 +21,10 @@ if uploaded_file is not None:
         # 選択された列のみを含む新しいDataFrameを作成
         new_df = df[selected_columns]
 
-        # データフレームを表示
-        st.write(new_df)
-
         if file_format == 'CSV':
+            # CSVプレビューを表示
+            st.write(new_df)
+
             # CSVとしてダウンロード可能にする
             csv = new_df.to_csv(index=False).encode('utf-8')
             st.download_button(
@@ -34,8 +34,12 @@ if uploaded_file is not None:
                 mime='text/csv',
             )
         elif file_format == 'JSON':
+            # JSON形式に変換
+            json_data = new_df.to_json(orient='records', lines=False, indent=2)
+            # JSONプレビューを表示
+            st.text_area('JSON Preview', json_data, height=300)
+
             # JSONとしてダウンロード可能にする
-            json_data = new_df.to_json(orient='records')
             st.download_button(
                 label="Download JSON",
                 data=json_data,
