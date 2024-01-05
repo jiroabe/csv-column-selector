@@ -34,8 +34,8 @@ if uploaded_file is not None:
                 mime='text/csv',
             )
         elif file_format == 'JSON':
-            # JSON形式に変換
-            json_data = new_df.to_json(orient='records', lines=False, indent=2)
+            # JSON形式に変換（Unicodeエスケープを防ぐ）
+            json_data = new_df.to_json(orient='records', lines=False, indent=2, ensure_ascii=False)
             # JSONプレビューを表示
             st.text_area('JSON Preview', json_data, height=300)
 
