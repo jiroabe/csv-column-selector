@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import json
 
 # ストリームリットページのタイトル
 st.title('CSV Column Selector and Exporter')
@@ -34,11 +33,8 @@ if uploaded_file is not None:
                 mime='text/csv',
             )
         elif file_format == 'JSON':
-            # JSON形式に変換（Unicodeエスケープを防ぐ）
-            json_data = new_df.to_json(orient='records', lines=False, indent=2, ensure_ascii=False)
-
-            # JSONデータをUTF-8でエンコード
-            json_data_encoded = json_data.encode('utf-8')
+            # JSON形式に変換
+            json_data = new_df.to_json(orient='records', lines=False, indent=2)
 
             # JSONプレビューを表示
             st.text_area('JSON Preview', json_data, height=300)
@@ -46,7 +42,7 @@ if uploaded_file is not None:
             # JSONとしてダウンロード可能にする
             st.download_button(
                 label="Download JSON",
-                data=json_data_encoded,
+                data=json_data,
                 file_name='selected_columns.json',
                 mime='application/json',
             )
