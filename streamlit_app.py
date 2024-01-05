@@ -1,40 +1,30 @@
-import altair as alt
-import numpy as np
-import pandas as pd
 import streamlit as st
+import pandas as pd
 
-"""
-# Welcome to Streamlit!
+# ストリームリットページのタイトル
+st.title('CSV Column Selector')
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+# CSVファイルのアップロード
+uploaded_file = st.file_uploader("Choose a CSV file", type='csv')
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+# 列の選択を行う
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+    all_columns = df.columns.tolist()
+    selected_columns = st.multiselect('Select columns', all_columns, default=all_columns[:min(10, len(all_columns))])
 
-num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
-num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
+    if st.button('Execute'):
+        # 選択された列のみを含む新しいDataFrameを作成
+        new_df = df[selected_columns]
 
-indices = np.linspace(0, 1, num_points)
-theta = 2 * np.pi * num_turns * indices
-radius = indices
+        # データフレームを表示
+        st.write(new_df)
 
-x = radius * np.cos(theta)
-y = radius * np.sin(theta)
-
-df = pd.DataFrame({
-    "x": x,
-    "y": y,
-    "idx": indices,
-    "rand": np.random.randn(num_points),
-})
-
-st.altair_chart(alt.Chart(df, height=700, width=700)
-    .mark_point(filled=True)
-    .encode(
-        x=alt.X("x", axis=None),
-        y=alt.Y("y", axis=None),
-        color=alt.Color("idx", legend=None, scale=alt.Scale()),
-        size=alt.Size("rand", legend=None, scale=alt.Scale(range=[1, 150])),
-    ))
+        # CSVとしてダウンロード可能にする
+        csv = new_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="Download CSV",
+            data=csv,
+            file_name='selected_columns.csv',
+            mime='text/csv',
+        )
