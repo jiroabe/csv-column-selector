@@ -33,16 +33,19 @@ if uploaded_file is not None:
                 mime='text/csv',
             )
         elif file_format == 'JSON':
-            # JSON形式に変換
-            json_data = new_df.to_json(orient='records', lines=False, indent=2)
+            # JSON形式に変換（Unicodeエスケープを防ぐ）
+            json_data = new_df.to_json(orient='records', lines=False, indent=2, ensure_ascii=False)
 
-            # JSONプレビューを表示
+            # JSONデータをUTF-8でエンコード
+            json_data_encoded = json_data.encode('utf-8')
+
+            # JSONプレビューを表示（UTF-8でデコード）
             st.text_area('JSON Preview', json_data, height=300)
 
             # JSONとしてダウンロード可能にする
             st.download_button(
                 label="Download JSON",
-                data=json_data,
+                data=json_data_encoded,
                 file_name='selected_columns.json',
                 mime='application/json',
             )
